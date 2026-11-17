@@ -42,7 +42,23 @@ jobs:
           fi
           PROJECT_DIR="${MANIFEST%/app/src/main/AndroidManifest.xml}"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-
+      - name: Corregir navegación de la aplicación
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          project = Path(os.environ["PROJECT_DIR"])
+          html = project / "app/src/main/assets/index.html"
+          if not html.exists():
+              raise SystemExit("No se encontró index.html")
+          content = html.read_text(encoding="utf-8")
+          old = r"}\nfunction exportAgenda"
+          new = "}\nfunction exportAgenda"
+          if old not in content:
+              raise SystemExit("No se encontró el error que debemos corregir")
+          html.write_text(content.replace(old, new, 1), encoding="utf-8")
+          print("Código corregido correctamente")
+          PY
       - name: Reparar configuración Android
         run: |
           cd "$PROJECT_DIR"
