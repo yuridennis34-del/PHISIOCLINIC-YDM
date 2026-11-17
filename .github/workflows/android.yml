@@ -22,10 +22,9 @@ jobs:
           java-version: '17'
 
       - name: Configurar Android SDK
-        run: yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses || true
-        
-      - name: Instalar herramientas Android
-        run: --sdk_root="$ANDROID_HOME" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
         
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v4
