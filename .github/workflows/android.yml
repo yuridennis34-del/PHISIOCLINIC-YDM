@@ -101,7 +101,54 @@ jobs:
               }
           }
           EOF
+      - name: Configurar icono de PHISIOCLINIC
+        run: |
+          python3 -m pip install --quiet Pillow
+          python3 - <<'PY'
+          import os, re, base64
+          from pathlib import Path
+          from io import BytesIO
+          from PIL import Image
 
+          project = Path(os.environ["PROJECT_DIR"])
+          html = project / "app/src/main/assets/index.html"
+          content = html.read_text(encoding="utf-8")
+
+          tags = re.findall(r"<img\b[^>]*>", content, flags=re.I)
+          logo_tag = next((tag for tag in tags if "Logotipo PHISIOCLINIC YDM" in tag), None)
+          if logo_tag is None:
+              raise SystemExit("No se encontró el logotipo")
+
+          match = re.search(r'\bsrc=["\']data:image/[^;]+;base64,([^"\']+)["\']', logo_tag, flags=re.I)
+          if match is None:
+              raise SystemExit("No se pudo extraer el logotipo")
+
+          logo = Image.open(BytesIO(base64.b64decode(match.group(1)))).convert("RGBA")
+
+          sizes = {
+              "mipmap-mdpi": 48,
+              "mipmap-hdpi": 72,
+              "mipmap-xhdpi": 96,
+              "mipmap-xxhdpi": 144,
+              "mipmap-xxxhdpi": 192
+          }
+
+          for folder, size in sizes.items():
+              target = project / "app/src/main/res" / folder
+              target.mkdir(parents=True, exist_ok=True)
+              logo.resize((size, size), Image.Resampling.LANCZOS).save(target / "ic_launcher.png")
+
+          manifest = project / "app/src/main/AndroidManifest.xml"
+          text = manifest.read_text(encoding="utf-8")
+          if "android:icon=" not in text:
+              text = text.replace(
+                  "<application",
+                  '<application\n        android:icon="@mipmap/ic_launcher"\n        android:roundIcon="@mipmap/ic_launcher"',
+                  1
+              )
+          manifest.write_text(text, encoding="utf-8")
+          print("Icono PHISIOCLINIC configurado correctamente")
+          PY
       - name: Construir APK
         run: |
           cd "$PROJECT_DIR"
