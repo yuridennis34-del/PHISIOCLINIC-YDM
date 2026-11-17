@@ -1,0 +1,104 @@
+
+name: Construir PHISIOCLINIC YDM APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar proyecto
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar herramientas Android
+        run: sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Extraer proyecto Android
+        run: |
+          mkdir proyecto
+          unzip -q PHISIOCLINIC_YDM_Android_Proyecto.zip -d proyecto
+          MANIFEST=$(find proyecto -path '*/app/src/main/AndroidManifest.xml' | head -n 1)
+          if [ -z "$MANIFEST" ]; then
+            echo "No se encontró AndroidManifest.xml"
+            exit 1
+          fi
+          PROJECT_DIR="${MANIFEST%/app/src/main/AndroidManifest.xml}"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Reparar configuración Android
+        run: |
+          cd "$PROJECT_DIR"
+
+          cat > settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = 'PHISIOCLINIC-YDM'
+          include ':app'
+          EOF
+
+          cat > build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.5.2' apply false
+          }
+          EOF
+
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+          }
+
+          android {
+              namespace 'com.phisioclinic.ydm'
+              compileSdk 34
+
+              defaultConfig {
+                  applicationId 'com.phisioclinic.ydm'
+                  minSdk 23
+                  targetSdk 34
+                  versionCode 1
+                  versionName '1.0'
+              }
+          }
+          EOF
+
+      - name: Construir APK
+        run: |
+          cd "$PROJECT_DIR"
+          gradle --no-daemon assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: PHISIOCLINIC-YDM-APK
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
+build/outputs/apk/debug/app-debug.apk
