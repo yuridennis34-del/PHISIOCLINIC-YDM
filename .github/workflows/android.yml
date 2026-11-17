@@ -1,5 +1,4 @@
-
-name: Construir PHISIOCLINIC YDM APK
+name: Construir PHISIOCLINIC YDM APK 4.0
 
 on:
   workflow_dispatch:
@@ -25,7 +24,7 @@ jobs:
         uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
-        
+
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -34,7 +33,7 @@ jobs:
       - name: Extraer proyecto Android
         run: |
           mkdir proyecto
-          unzip -q PHISIOCLINIC_YDM_Android_Proyecto.zip -d proyecto
+          unzip -q PHISIOCLINIC_YDM_Android_Proyecto_V4.0.zip -d proyecto
           MANIFEST=$(find proyecto -path '*/app/src/main/AndroidManifest.xml' | head -n 1)
           if [ -z "$MANIFEST" ]; then
             echo "No se encontró AndroidManifest.xml"
@@ -42,7 +41,8 @@ jobs:
           fi
           PROJECT_DIR="${MANIFEST%/app/src/main/AndroidManifest.xml}"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-      - name: Corregir navegación de la aplicación
+
+      - name: Verificar navegación de la aplicación
         run: |
           python3 - <<'PY'
           import os
@@ -54,12 +54,17 @@ jobs:
           content = html.read_text(encoding="utf-8")
           old = r"}\nfunction exportAgenda"
           new = "}\nfunction exportAgenda"
-          if old not in content:
-              raise SystemExit("No se encontró el error que debemos corregir")
-          html.write_text(content.replace(old, new, 1), encoding="utf-8")
-          print("Código corregido correctamente")
+          if old in content:
+              content = content.replace(old, new, 1)
+              html.write_text(content, encoding="utf-8")
+              print("Navegación corregida")
+          elif "function exportAgenda" in content:
+              print("La navegación ya está corregida")
+          else:
+              raise SystemExit("No se encontró la función de exportación de agenda")
           PY
-      - name: Reparar configuración Android
+
+      - name: Reparar configuración Android versión 4.0
         run: |
           cd "$PROJECT_DIR"
           cat > settings.gradle <<'EOF'
@@ -93,14 +98,15 @@ jobs:
               namespace 'com.phisioclinic.ydm'
               compileSdk 34
               defaultConfig {
-                  applicationId 'com.phisioclinic.ydm'
+                  applicationId 'com.phisioclinic.ydm.v4'
                   minSdk 23
                   targetSdk 34
-                  versionCode 1
-                  versionName '1.0'
+                  versionCode 4
+                  versionName '4.0'
               }
           }
           EOF
+
       - name: Configurar icono de PHISIOCLINIC
         run: |
           python3 -m pip install --quiet Pillow
@@ -113,18 +119,14 @@ jobs:
           project = Path(os.environ["PROJECT_DIR"])
           html = project / "app/src/main/assets/index.html"
           content = html.read_text(encoding="utf-8")
-
           tags = re.findall(r"<img\b[^>]*>", content, flags=re.I)
           logo_tag = next((tag for tag in tags if "Logotipo PHISIOCLINIC YDM" in tag), None)
           if logo_tag is None:
-              raise SystemExit("No se encontró el logotipo")
-
-          match = re.search(r'\bsrc=["\']data:image/[^;]+;base64,([^"\']+)["\']', logo_tag, flags=re.I)
+              raise SystemExit("No se encontró el logotipo de PHISIOCLINIC")
+          match = re.search(r'\bsrc=["\']data:image/[^;]+;base64,([^"\']+)', logo_tag, flags=re.I)
           if match is None:
               raise SystemExit("No se pudo extraer el logotipo")
-
           logo = Image.open(BytesIO(base64.b64decode(match.group(1)))).convert("RGBA")
-
           sizes = {
               "mipmap-mdpi": 48,
               "mipmap-hdpi": 72,
@@ -132,12 +134,10 @@ jobs:
               "mipmap-xxhdpi": 144,
               "mipmap-xxxhdpi": 192
           }
-
           for folder, size in sizes.items():
               target = project / "app/src/main/res" / folder
               target.mkdir(parents=True, exist_ok=True)
               logo.resize((size, size), Image.Resampling.LANCZOS).save(target / "ic_launcher.png")
-
           manifest = project / "app/src/main/AndroidManifest.xml"
           text = manifest.read_text(encoding="utf-8")
           if "android:icon=" not in text:
@@ -149,7 +149,8 @@ jobs:
           manifest.write_text(text, encoding="utf-8")
           print("Icono PHISIOCLINIC configurado correctamente")
           PY
-      - name: Construir APK
+
+      - name: Construir APK versión 4.0
         run: |
           cd "$PROJECT_DIR"
           gradle --no-daemon assembleDebug
@@ -157,5 +158,5 @@ jobs:
       - name: Guardar APK
         uses: actions/upload-artifact@v4
         with:
-          name: PHISIOCLINIC-YDM-APK
+          name: PHISIOCLINIC-YDM-APK-4.0
           path: proyecto/**/app/build/outputs/apk/debug/app-debug.apk
