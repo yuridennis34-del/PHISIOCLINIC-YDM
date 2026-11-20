@@ -26,7 +26,6 @@ button{border:0;border-radius:11px;background:var(--blue);color:#fff;padding:12p
 .profile{text-align:center}.profile-photo{width:105px;height:105px;object-fit:cover;border-radius:50%;border:4px solid #dff3f7;display:block;margin:0 auto 12px}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat{background:#f1f7fa;border-radius:12px;padding:12px}.stat span{display:block;font-size:11px;color:var(--muted)}.stat strong{display:block;font-size:18px;color:var(--navy);margin-top:4px}
 .money-item{border-top:1px solid var(--line);padding:13px 0}.money-item:first-child{border-top:0}.money-line{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin:5px 0}.money-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
-@media(min-width:700px){body{padding:24px 0}.shell{border-radius:24px;overflow:hidden;min-height:calc(100vh - 48px)}}
 </style>
 </head>
 <body>
@@ -69,7 +68,6 @@ button{border:0;border-radius:11px;background:var(--blue);color:#fff;padding:12p
     <div class="notice">Los procedimientos médicos, infiltraciones y medicamentos requieren valoración y prescripción del profesional médico correspondiente; no forman parte automática de una sesión de fisioterapia.</div>
     <div class="card"><h3>Atención profesional</h3><p class="small"><b>Dr. Fst. Yuri Dennis Marañón Rivas</b><br>Fisioterapeuta kinesiólogo</p><a href="https://wa.me/59171850352" target="_blank" rel="noopener"><button class="full">Contactar por WhatsApp</button></a></div>
   </section>
-
   <section id="reservar" class="hidden">
     <h2>Solicitar una cita</h2><p class="small">Completa tus datos. Tu solicitud quedará pendiente hasta que la clínica la confirme.</p>
     <form id="bookingForm" class="card">
@@ -82,7 +80,6 @@ button{border:0;border-radius:11px;background:var(--blue);color:#fff;padding:12p
     </form>
     <p class="small">Enviar una solicitud no garantiza que el horario esté disponible. La clínica se comunicará contigo para confirmar.</p>
   </section>
-
   <section id="admin" class="hidden">
     <h2>Panel de administración</h2>
     <div id="adminLogin" class="card">
@@ -94,18 +91,14 @@ button{border:0;border-radius:11px;background:var(--blue);color:#fff;padding:12p
       <div class="row"><p class="small">Sesión de administrador activa</p><button class="secondary" id="logoutButton">Salir</button></div>
       <div class="row"><h3>Solicitudes recibidas</h3><button class="secondary" id="refreshButton">Actualizar</button></div>
       <div id="bookingList" class="card"><p class="small">Cargando reservas…</p></div>
-
       <h2>Control de pagos</h2>
       <p class="small">Registro interno de tratamientos, anticipos, cuotas y saldos de pacientes.</p>
-      <div class="card">
-        <h3>Resumen de ingresos</h3>
-        <div class="stat-grid">
-          <div class="stat"><span>Total recaudado</span><strong id="totalCollected">Bs 0,00</strong></div>
-          <div class="stat"><span>Saldo pendiente</span><strong id="totalPending">Bs 0,00</strong></div>
-          <div class="stat"><span>Recaudado hoy</span><strong id="collectedToday">Bs 0,00</strong></div>
-          <div class="stat"><span>Recaudado este mes</span><strong id="collectedMonth">Bs 0,00</strong></div>
-        </div>
-      </div>
+      <div class="card"><h3>Resumen de ingresos</h3><div class="stat-grid">
+        <div class="stat"><span>Total recaudado</span><strong id="totalCollected">Bs 0,00</strong></div>
+        <div class="stat"><span>Saldo pendiente</span><strong id="totalPending">Bs 0,00</strong></div>
+        <div class="stat"><span>Recaudado hoy</span><strong id="collectedToday">Bs 0,00</strong></div>
+        <div class="stat"><span>Recaudado este mes</span><strong id="collectedMonth">Bs 0,00</strong></div>
+      </div></div>
       <form id="newTreatmentForm" class="card">
         <h3>Registrar tratamiento y primer pago</h3>
         <label for="payPatient">Nombre del paciente</label><input id="payPatient" maxlength="80" required minlength="3">
@@ -119,189 +112,37 @@ button{border:0;border-radius:11px;background:var(--blue);color:#fff;padding:12p
         <button id="saveTreatment" class="full" type="submit">Guardar tratamiento y pago</button>
         <div id="paymentMessage" class="notice hidden" role="status"></div>
       </form>
-      <div class="card">
-        <h3>Tratamientos y saldos</h3>
-        <label for="paymentSearch">Buscar paciente</label><input id="paymentSearch" placeholder="Escribe el nombre del paciente">
-        <div id="paymentList"><p class="small">Cargando registros…</p></div>
-      </div>
+      <div class="card"><h3>Tratamientos y saldos</h3><label for="paymentSearch">Buscar paciente</label><input id="paymentSearch" placeholder="Escribe el nombre del paciente"><div id="paymentList"><p class="small">Cargando registros…</p></div></div>
     </div>
   </section>
 </main>
 <footer>PHISIOCLINIC Y.D.M. · Oruro, Bolivia</footer>
 </div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 import { getDatabase, ref, push, set, get, update } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDK3C5c-dzU5Lmh-oID-GM-QDvDsmYpaNA",
-  authDomain: "phisioclinic-ydm-609cd.firebaseapp.com",
-  databaseURL: "https://phisioclinic-ydm-609cd-default-rtdb.firebaseio.com",
-  projectId: "phisioclinic-ydm-609cd",
-  storageBucket: "phisioclinic-ydm-609cd.firebasestorage.app",
-  messagingSenderId: "536636303297",
-  appId: "1:536636303297:web:a4cd4267558139b65e7140",
-  measurementId: "G-YRW5MQCGN1"
-};
-const ADMIN_UID = "3SQNHwMZyVPKz3ACAt9cawUpdJa2";
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-const $ = id => document.getElementById(id);
-const money = n => "Bs " + (Number(n)||0).toLocaleString("es-BO",{minimumFractionDigits:2,maximumFractionDigits:2});
-const localDate = () => {const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
-const today = localDate();
-$("fecha").min=today;$("payDate").value=today;
-function showMessage(el,message,type="notice"){el.textContent=message;el.className=type;}
-
-document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{
-  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b===btn));
-  ["inicio","reservar","admin"].forEach(id=>$(id).classList.toggle("hidden",id!==btn.dataset.tab));
-}));
-
-$("bookingForm").addEventListener("submit",async e=>{
-  e.preventDefault();const button=$("sendBooking");button.disabled=true;button.textContent="Enviando…";
-  const message=$("bookingMessage");message.classList.remove("hidden");
-  try{
-    if(!auth.currentUser)await signInAnonymously(auth);
-    const bookingRef=push(ref(db,"reservas"));
-    const booking={nombre:$("nombre").value.trim(),telefono:$("telefono").value.trim(),servicio:$("servicio").value,fecha:$("fecha").value,hora:$("hora").value,estado:"Pendiente",creadoEn:Date.now()};
-    await set(bookingRef,booking);
-    showMessage(message,"Tu solicitud fue enviada correctamente. La clínica se comunicará contigo para confirmar la cita.","success");
-    $("bookingForm").reset();$("fecha").min=localDate();
-  }catch(err){console.error(err);showMessage(message,"No se pudo enviar la solicitud. Verifica tu conexión e inténtalo nuevamente.","error");}
-  finally{button.disabled=false;button.textContent="Enviar solicitud de cita";}
-});
-
-$("loginForm").addEventListener("submit",async e=>{
-  e.preventDefault();const b=$("loginButton");b.disabled=true;
-  try{
-    const credential=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);
-    if(credential.user.uid!==ADMIN_UID){await signOut(auth);throw new Error("Esta cuenta no tiene permisos de administración.");}
-    $("loginMessage").classList.add("hidden");
-  }catch(err){showMessage($("loginMessage"),err.message==="Firebase: Error (auth/invalid-credential)."?"Correo o contraseña incorrectos.":(err.message||"No se pudo iniciar sesión."),"error");}
-  finally{b.disabled=false;}
-});
-$("logoutButton").addEventListener("click",()=>signOut(auth));
-$("refreshButton").addEventListener("click",loadBookings);
-$("paymentSearch").addEventListener("input",renderPayments);
-
-onAuthStateChanged(auth,user=>{
-  const isAdmin=!!user&&user.uid===ADMIN_UID&&!user.isAnonymous;
-  $("adminLogin").classList.toggle("hidden",isAdmin);
-  $("adminPanel").classList.toggle("hidden",!isAdmin);
-  if(isAdmin){loadBookings();loadPayments();}
-});
-
-async function loadBookings(){
-  const list=$("bookingList");list.innerHTML='<p class="small">Cargando reservas…</p>';
-  try{
-    const snap=await get(ref(db,"reservas"));
-    if(!snap.exists()){list.innerHTML='<p class="small">Todavía no hay solicitudes de citas.</p>';return;}
-    const entries=Object.entries(snap.val()).sort((a,b)=>(b[1].creadoEn||0)-(a[1].creadoEn||0));list.innerHTML="";
-    for(const [id,item] of entries){
-      const wrap=document.createElement("div");wrap.className="booking";
-      const title=document.createElement("div");title.className="row";
-      const name=document.createElement("b");name.textContent=item.nombre||"Paciente";
-      const status=document.createElement("span");status.className="status";status.textContent=item.estado||"Pendiente";
-      title.append(name,status);wrap.append(title);
-      const detail=document.createElement("p");detail.className="small";detail.style.whiteSpace="pre-line";detail.textContent=`${item.servicio||""} · ${item.fecha||""} · ${item.hora||""}\nTeléfono: ${item.telefono||""}`;wrap.append(detail);
-      const actions=document.createElement("div");actions.className="row";actions.style.flexWrap="wrap";
-      for(const [label,value] of [["Confirmar","Confirmada"],["Atendida","Atendida"],["Cancelar","Cancelada"]]){
-        const btn=document.createElement("button");btn.className=value==="Cancelada"?"danger":"secondary";btn.textContent=label;
-        btn.addEventListener("click",async()=>{btn.disabled=true;try{await update(ref(db,"reservas/"+id),{estado:value});await loadBookings();}catch(err){alert("No se pudo actualizar el estado. "+err.message);btn.disabled=false;}});
-        actions.append(btn);
-      }
-      wrap.append(actions);list.append(wrap);
-    }
-  }catch(err){console.error(err);list.innerHTML='<p class="small error">No se pudieron cargar las reservas. Comprueba las reglas de Firebase.</p>';}
-}
-
-$("newTreatmentForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID){showMessage($("paymentMessage"),"Debes iniciar sesión como administrador.","error");return;}
-  const total=Number($("payTotal").value),initial=Number($("payInitial").value);
-  if(!Number.isFinite(total)||total<=0||!Number.isFinite(initial)||initial<0||initial>total){showMessage($("paymentMessage"),"Verifica los importes: el anticipo no puede ser mayor que el costo total.","error");return;}
-  const button=$("saveTreatment");button.disabled=true;
-  try{
-    const idRef=push(ref(db,"pagos"));const id=idRef.key;const date=$("payDate").value||localDate();
-    const movements={};
-    if(initial>0){const m=push(ref(db,`pagos/${id}/movimientos`));movements[m.key]={importe:initial,fecha:date,metodo:$("payMethod").value,observacion:$("payNote").value.trim(),creadoEn:Date.now()};}
-    const record={paciente:$("payPatient").value.trim(),telefono:$("payPhone").value.trim(),tratamiento:$("payTreatment").value.trim(),costoTotal:total,pagado:initial,saldo:Number((total-initial).toFixed(2)),estado:initial>=total?"Pagado":"Pendiente",fechaInicio:date,creadoEn:Date.now(),movimientos};
-    await set(idRef,record);
-    showMessage($("paymentMessage"),"Tratamiento y pago registrados correctamente.","success");
-    $("newTreatmentForm").reset();$("payInitial").value="0";$("payDate").value=localDate();
-    await loadPayments();
-  }catch(err){console.error(err);showMessage($("paymentMessage"),"No se pudo guardar. Verifica tu conexión y las reglas de pagos de Firebase.","error");}
-  finally{button.disabled=false;}
-});
-
+const firebaseConfig={apiKey:"AIzaSyDK5c3C5-dzU5Lmh-oID-GM-QDvDsmYpaNA",authDomain:"phisioclinic-ydm-609cd.firebaseapp.com",databaseURL:"https://phisioclinic-ydm-609cd-default-rtdb.firebaseio.com",projectId:"phisioclinic-ydm-609cd",storageBucket:"phisioclinic-ydm-609cd.firebasestorage.app",messagingSenderId:"536636303297",appId:"1:536636303297:web:a4cd4267558139b65e7140",measurementId:"G-YRW5MQCGN1"};
+const ADMIN_UID="3SQNHwMZyVPKz3ACAt9cawUpdJa2";
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app),$=id=>document.getElementById(id);
+const money=n=>"Bs "+(Number(n)||0).toLocaleString("es-BO",{minimumFractionDigits:2,maximumFractionDigits:2});
+const localDate=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
+$("fecha").min=localDate();$("payDate").value=localDate();
+function showMessage(el,message,type="notice"){el.textContent=message;el.className=type;el.classList.remove("hidden");}
+function errorDetails(err){return `${err?.code||"sin código"}: ${err?.message||String(err)}`;}
+document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b===btn));["inicio","reservar","admin"].forEach(id=>$(id).classList.toggle("hidden",id!==btn.dataset.tab));}));
+$("bookingForm").addEventListener("submit",async e=>{e.preventDefault();const b=$("sendBooking");b.disabled=true;b.textContent="Enviando…";const msg=$("bookingMessage");msg.classList.remove("hidden");try{if(!auth.currentUser)await signInAnonymously(auth);const bookingRef=push(ref(db,"reservas"));const booking={nombre:$("nombre").value.trim(),telefono:$("telefono").value.trim(),servicio:$("servicio").value,fecha:$("fecha").value,hora:$("hora").value,estado:"Pendiente",creadoEn:Date.now()};await set(bookingRef,booking);showMessage(msg,"Tu solicitud fue enviada correctamente. La clínica se comunicará contigo para confirmar la cita.","success");$("bookingForm").reset();$("fecha").min=localDate();}catch(err){console.error("Error al guardar reserva:",err);showMessage(msg,"No se pudo enviar la solicitud: "+errorDetails(err),"error");}finally{b.disabled=false;b.textContent="Enviar solicitud de cita";}});
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();const b=$("loginButton");b.disabled=true;try{const credential=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);if(credential.user.uid!==ADMIN_UID){await signOut(auth);throw new Error("Esta cuenta no tiene permisos de administración.");}$("loginMessage").classList.add("hidden");}catch(err){showMessage($("loginMessage"),errorDetails(err),"error");}finally{b.disabled=false;}});
+$("logoutButton").addEventListener("click",()=>signOut(auth));$("refreshButton").addEventListener("click",()=>{loadBookings();loadPayments();});$("paymentSearch").addEventListener("input",renderPayments);
+onAuthStateChanged(auth,user=>{const isAdmin=!!user&&user.uid===ADMIN_UID&&!user.isAnonymous;$("adminLogin").classList.toggle("hidden",isAdmin);$("adminPanel").classList.toggle("hidden",!isAdmin);if(isAdmin){loadBookings();loadPayments();}});
+async function loadBookings(){const list=$("bookingList");list.innerHTML='<p class="small">Cargando reservas…</p>';try{const snap=await get(ref(db,"reservas"));if(!snap.exists()){list.innerHTML='<p class="small">Todavía no hay solicitudes de citas.</p>';return;}const entries=Object.entries(snap.val()).sort((a,b)=>(b[1].creadoEn||0)-(a[1].creadoEn||0));list.innerHTML="";for(const [id,item] of entries){const wrap=document.createElement("div");wrap.className="booking";const title=document.createElement("div");title.className="row";const name=document.createElement("b");name.textContent=item.nombre||"Paciente";const status=document.createElement("span");status.className="status";status.textContent=item.estado||"Pendiente";title.append(name,status);wrap.append(title);const detail=document.createElement("p");detail.className="small";detail.style.whiteSpace="pre-line";detail.textContent=`${item.servicio||""} · ${item.fecha||""} · ${item.hora||""}\nTeléfono: ${item.telefono||""}`;wrap.append(detail);const actions=document.createElement("div");actions.className="row";actions.style.flexWrap="wrap";for(const [label,value] of [["Confirmar","Confirmada"],["Atendida","Atendida"],["Cancelar","Cancelada"]]){const btn=document.createElement("button");btn.className=value==="Cancelada"?"danger":"secondary";btn.textContent=label;btn.addEventListener("click",async()=>{btn.disabled=true;try{await update(ref(db,"reservas/"+id),{estado:value});await loadBookings();}catch(err){alert("No se pudo actualizar el estado: "+errorDetails(err));btn.disabled=false;}});actions.append(btn);}wrap.append(actions);list.append(wrap);}}catch(err){console.error("Error al cargar reservas:",err);list.innerHTML='<p class="small error">No se pudieron cargar las reservas: '+errorDetails(err)+'</p>';}}
+$("newTreatmentForm").addEventListener("submit",async e=>{e.preventDefault();if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID||auth.currentUser.isAnonymous){showMessage($("paymentMessage"),"Debes iniciar sesión con la cuenta administradora correcta.","error");return;}const total=Number($("payTotal").value),initial=Number($("payInitial").value);if(!Number.isFinite(total)||total<=0||!Number.isFinite(initial)||initial<0||initial>total){showMessage($("paymentMessage"),"Verifica los importes: el anticipo no puede ser mayor que el costo total.","error");return;}if(initial>0&&!$("payMethod").value){showMessage($("paymentMessage"),"Selecciona el método de pago del anticipo.","error");return;}const button=$("saveTreatment");button.disabled=true;try{const idRef=push(ref(db,"pagos"));const id=idRef.key,date=$("payDate").value||localDate(),movements={};if(initial>0){const m=push(ref(db,`pagos/${id}/movimientos`));movements[m.key]={importe:initial,fecha:date,metodo:$("payMethod").value,observacion:$("payNote").value.trim(),creadoEn:Date.now()};}const record={paciente:$("payPatient").value.trim(),telefono:$("payPhone").value.trim(),tratamiento:$("payTreatment").value.trim(),costoTotal:total,pagado:initial,saldo:Number((total-initial).toFixed(2)),estado:initial>=total?"Pagado":"Pendiente",fechaInicio:date,creadoEn:Date.now(),movimientos};await set(idRef,record);showMessage($("paymentMessage"),"Tratamiento y pago registrados correctamente.","success");$("newTreatmentForm").reset();$("payInitial").value="0";$("payDate").value=localDate();await loadPayments();}catch(err){console.error("ERROR REAL AL GUARDAR PAGOS",err);showMessage($("paymentMessage"),"ERROR DE FIREBASE → "+errorDetails(err)+" | UID activo: "+(auth.currentUser?.uid||"sin sesión"),"error");}finally{button.disabled=false;}});
 let paymentRecords={};
-async function loadPayments(){
-  if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID)return;
-  const list=$("paymentList");list.innerHTML='<p class="small">Cargando registros…</p>';
-  try{
-    const snap=await get(ref(db,"pagos"));paymentRecords=snap.exists()?snap.val():{};
-    updatePaymentSummary();renderPayments();
-  }catch(err){console.error(err);list.innerHTML='<p class="small error">No se pudieron cargar los pagos. Comprueba las reglas de Firebase.</p>';}
-}
-function updatePaymentSummary(){
-  let collected=0,pending=0,todayTotal=0,monthTotal=0;const month=localDate().slice(0,7);
-  Object.values(paymentRecords).forEach(r=>{
-    pending+=Number(r.saldo)||0;
-    Object.values(r.movimientos||{}).forEach(m=>{
-      const amount=Number(m.importe)||0;collected+=amount;
-      if(m.fecha===localDate())todayTotal+=amount;
-      if((m.fecha||"").slice(0,7)===month)monthTotal+=amount;
-    });
-  });
-  $("totalCollected").textContent=money(collected);$("totalPending").textContent=money(pending);
-  $("collectedToday").textContent=money(todayTotal);$("collectedMonth").textContent=money(monthTotal);
-}
-function renderPayments(){
-  const list=$("paymentList");if(!list)return;
-  const term=($("paymentSearch").value||"").trim().toLowerCase();
-  const entries=Object.entries(paymentRecords).filter(([id,r])=>(r.paciente||"").toLowerCase().includes(term)).sort((a,b)=>(b[1].creadoEn||0)-(a[1].creadoEn||0));
-  list.innerHTML="";
-  if(!entries.length){list.innerHTML='<p class="small">No hay tratamientos registrados con ese nombre.</p>';return;}
-  for(const [id,r] of entries){
-    const item=document.createElement("div");item.className="money-item";
-    const head=document.createElement("div");head.className="row";
-    const patient=document.createElement("b");patient.textContent=r.paciente||"Paciente";
-    const state=document.createElement("span");state.className="status "+(r.estado||"Pendiente");state.textContent=r.estado||"Pendiente";
-    head.append(patient,state);item.append(head);
-    const info=document.createElement("p");info.className="small";info.textContent=(r.tratamiento||"Tratamiento")+(r.telefono?" · "+r.telefono:"");item.append(info);
-    for(const [label,value] of [["Costo total",money(r.costoTotal)],["Pagado",money(r.pagado)],["Saldo",money(r.saldo)]]){const line=document.createElement("div");line.className="money-line";const a=document.createElement("span");a.textContent=label;const b=document.createElement("b");b.textContent=value;line.append(a,b);item.append(line);}
-    const actions=document.createElement("div");actions.className="money-actions";
-    if((Number(r.saldo)||0)>0){
-      const btn=document.createElement("button");btn.textContent="Registrar cuota / pago";btn.addEventListener("click",()=>registerInstallment(id,r));actions.append(btn);
-    }
-    const history=document.createElement("button");history.className="secondary";history.textContent="Ver historial";history.addEventListener("click",()=>showPaymentHistory(r));actions.append(history);
-    item.append(actions);list.append(item);
-  }
-}
-async function registerInstallment(id,r){
-  const raw=prompt(`Paciente: ${r.paciente}\nSaldo pendiente: ${money(r.saldo)}\n\nIngresa el importe del nuevo pago en Bs:`);
-  if(raw===null)return;const amount=Number(raw);
-  if(!Number.isFinite(amount)||amount<=0||amount>Number(r.saldo)){alert("Importe inválido. Debe ser mayor que cero y no superar el saldo pendiente.");return;}
-  const method=prompt("Método de pago: Efectivo, Transferencia, QR, Tarjeta u Otro","Efectivo");if(method===null)return;
-  const date=prompt("Fecha del pago (AAAA-MM-DD):",localDate());if(date===null)return;
-  const note=prompt("Observación (opcional):","")||"";
-  try{
-    const movementRef=push(ref(db,`pagos/${id}/movimientos`));
-    const newPaid=Number((Number(r.pagado||0)+amount).toFixed(2));const newBalance=Number((Number(r.costoTotal)-newPaid).toFixed(2));
-    await set(movementRef,{importe:amount,fecha:date,metodo:method,observacion:note,creadoEn:Date.now()});
-    await update(ref(db,`pagos/${id}`),{pagado:newPaid,saldo:newBalance,estado:newBalance<=0?"Pagado":"Pendiente"});
-    await loadPayments();alert("Pago registrado correctamente.");
-  }catch(err){console.error(err);alert("No se pudo registrar el pago. "+err.message);}
-}
-function showPaymentHistory(r){
-  const moves=Object.values(r.movimientos||{}).sort((a,b)=>(a.creadoEn||0)-(b.creadoEn||0));
-  const lines=moves.map(m=>`${m.fecha||""} | ${money(m.importe)} | ${m.metodo||"Sin método"}${m.observacion?" | "+m.observacion:""}`);
-  alert(`Historial de pagos: ${r.paciente}\n\n${lines.length?lines.join("\n"):"Sin pagos registrados"}\n\nTotal pagado: ${money(r.pagado)}\nSaldo: ${money(r.saldo)}`);
-}
+async function loadPayments(){if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID)return;const list=$("paymentList");list.innerHTML='<p class="small">Cargando registros…</p>';try{const snap=await get(ref(db,"pagos"));paymentRecords=snap.exists()?snap.val():{};updatePaymentSummary();renderPayments();}catch(err){console.error("Error al leer pagos:",err);list.innerHTML='<p class="small error">No se pudieron cargar los pagos: '+errorDetails(err)+'</p>';}}
+function updatePaymentSummary(){let collected=0,pending=0,todayTotal=0,monthTotal=0;const month=localDate().slice(0,7);Object.values(paymentRecords).forEach(r=>{pending+=Number(r.saldo)||0;Object.values(r.movimientos||{}).forEach(m=>{const amount=Number(m.importe)||0;collected+=amount;if(m.fecha===localDate())todayTotal+=amount;if((m.fecha||"").slice(0,7)===month)monthTotal+=amount;});});$("totalCollected").textContent=money(collected);$("totalPending").textContent=money(pending);$("collectedToday").textContent=money(todayTotal);$("collectedMonth").textContent=money(monthTotal);}
+function renderPayments(){const list=$("paymentList");if(!list)return;const term=($("paymentSearch").value||"").trim().toLowerCase();const entries=Object.entries(paymentRecords).filter(([id,r])=>(r.paciente||"").toLowerCase().includes(term)).sort((a,b)=>(b[1].creadoEn||0)-(a[1].creadoEn||0));list.innerHTML="";if(!entries.length){list.innerHTML='<p class="small">No hay tratamientos registrados con ese nombre.</p>';return;}for(const [id,r] of entries){const item=document.createElement("div");item.className="money-item";const head=document.createElement("div");head.className="row";const patient=document.createElement("b");patient.textContent=r.paciente||"Paciente";const state=document.createElement("span");state.className="status "+(r.estado||"Pendiente");state.textContent=r.estado||"Pendiente";head.append(patient,state);item.append(head);const info=document.createElement("p");info.className="small";info.textContent=(r.tratamiento||"Tratamiento")+(r.telefono?" · "+r.telefono:"");item.append(info);for(const [label,value] of [["Costo total",money(r.costoTotal)],["Pagado",money(r.pagado)],["Saldo",money(r.saldo)]]){const line=document.createElement("div");line.className="money-line";const a=document.createElement("span");a.textContent=label;const b=document.createElement("b");b.textContent=value;line.append(a,b);item.append(line);}const actions=document.createElement("div");actions.className="money-actions";if((Number(r.saldo)||0)>0){const btn=document.createElement("button");btn.textContent="Registrar cuota / pago";btn.addEventListener("click",()=>registerInstallment(id,r));actions.append(btn);}const history=document.createElement("button");history.className="secondary";history.textContent="Ver historial";history.addEventListener("click",()=>showPaymentHistory(r));actions.append(history);item.append(actions);list.append(item);}}
+async function registerInstallment(id,r){const raw=prompt(`Paciente: ${r.paciente}\nSaldo pendiente: ${money(r.saldo)}\n\nIngresa el importe del nuevo pago en Bs:`);if(raw===null)return;const amount=Number(raw);if(!Number.isFinite(amount)||amount<=0||amount>Number(r.saldo)){alert("Importe inválido. Debe ser mayor que cero y no superar el saldo pendiente.");return;}const method=prompt("Método de pago: Efectivo, Transferencia, QR, Tarjeta u Otro","Efectivo");if(method===null)return;const date=prompt("Fecha del pago (AAAA-MM-DD):",localDate());if(date===null)return;const note=prompt("Observación (opcional):","")||"";try{const movementRef=push(ref(db,`pagos/${id}/movimientos`));const newPaid=Number((Number(r.pagado||0)+amount).toFixed(2)),newBalance=Number((Number(r.costoTotal)-newPaid).toFixed(2));await set(movementRef,{importe:amount,fecha:date,metodo:method,observacion:note,creadoEn:Date.now()});await update(ref(db,`pagos/${id}`),{pagado:newPaid,saldo:newBalance,estado:newBalance<=0?"Pagado":"Pendiente"});await loadPayments();alert("Pago registrado correctamente.");}catch(err){console.error("Error al registrar cuota:",err);alert("No se pudo registrar el pago: "+errorDetails(err));}}
+function showPaymentHistory(r){const moves=Object.values(r.movimientos||{}).sort((a,b)=>(a.creadoEn||0)-(b.creadoEn||0));const lines=moves.map(m=>`${m.fecha||""} | ${money(m.importe)} | ${m.metodo||"Sin método"}${m.observacion?" | "+m.observacion:""}`);alert(`Historial de pagos: ${r.paciente}\n\n${lines.length?lines.join("\n"):"Sin pagos registrados"}\n\nTotal pagado: ${money(r.pagado)}\nSaldo: ${money(r.saldo)}`);}
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.warn));}
 </script>
 </body>
