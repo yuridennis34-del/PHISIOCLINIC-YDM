@@ -42,28 +42,18 @@ jobs:
           fi
           PROJECT_DIR="${MANIFEST%/app/src/main/AndroidManifest.xml}"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-
-      - name: Verificar navegación
+          
+      - name: Copiar la aplicación web actual
         run: |
-          python3 - <<'PY'
-          import os
-          from pathlib import Path
-          project = Path(os.environ["PROJECT_DIR"])
-          html = project / "app/src/main/assets/index.html"
-          if not html.exists():
-              raise SystemExit("No se encontró index.html")
-          content = html.read_text(encoding="utf-8")
-          old = r"}\nfunction exportAgenda"
-          new = "}\nfunction exportAgenda"
-          if old in content:
-              content = content.replace(old, new, 1)
-              html.write_text(content, encoding="utf-8")
-              print("Navegación corregida")
-          elif "function exportAgenda" in content:
-              print("La navegación ya está corregida")
-          else:
-              raise SystemExit("No se encontró la función de exportación de agenda")
-          PY
+          ASSETS="$PROJECT_DIR/app/src/main/assets"
+          mkdir -p "$ASSETS"
+          cp index.html logo.png foto-yuri.jpg "$ASSETS/"
+          if [ -f manifest.json ]; then cp manifest.json "$ASSETS/"; fi
+          if [ -f sw.js ]; then cp sw.js "$ASSETS/"; fi
+          grep -q 'id="newTreatmentForm"' "$ASSETS/index.html"
+          grep -q 'id="paymentList"' "$ASSETS/index.html"
+          grep -q 'id="bookingForm"' "$ASSETS/index.html"
+          echo "Aplicación web actual copiada y verificada" 
 
       - name: Configurar Android versión 4.1
         run: |
@@ -102,8 +92,8 @@ jobs:
                   applicationId 'com.phisioclinic.ydm.v41'
                   minSdk 23
                   targetSdk 34
-                  versionCode 5
-                  versionName '4.1'
+                  versionCode 6
+                  versionName '4.2'
               }
           }
           EOF
