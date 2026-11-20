@@ -122,7 +122,7 @@ button{border:0;border-radius:11px;background:var(--blue);color:#fff;padding:12p
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 import { getDatabase, ref, push, set, get, update } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-database.js";
-const firebaseConfig={apiKey:"AIzaSyDK5c3C5-dzU5Lmh-oID-GM-QDvDsmYpaNA",authDomain:"phisioclinic-ydm-609cd.firebaseapp.com",databaseURL:"https://phisioclinic-ydm-609cd-default-rtdb.firebaseio.com",projectId:"phisioclinic-ydm-609cd",storageBucket:"phisioclinic-ydm-609cd.firebasestorage.app",messagingSenderId:"536636303297",appId:"1:536636303297:web:a4cd4267558139b65e7140",measurementId:"G-YRW5MQCGN1"};
+const firebaseConfig={apiKey:"AIzaSyDK3C5c-dzU5Lmh-oID-GM-QDvDsmYpaNA",authDomain:"phisioclinic-ydm-609cd.firebaseapp.com",databaseURL:"https://phisioclinic-ydm-609cd-default-rtdb.firebaseio.com",projectId:"phisioclinic-ydm-609cd",storageBucket:"phisioclinic-ydm-609cd.firebasestorage.app",messagingSenderId:"536636303297",appId:"1:536636303297:web:a4cd4267558139b65e7140",measurementId:"G-YRW5MQCGN1"};
 const ADMIN_UID="3SQNHwMZyVPKz3ACAt9cawUpdJa2";
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app),$=id=>document.getElementById(id);
 const money=n=>"Bs "+(Number(n)||0).toLocaleString("es-BO",{minimumFractionDigits:2,maximumFractionDigits:2});
